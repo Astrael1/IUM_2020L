@@ -19,12 +19,17 @@ product_data["category_path"] = product_data["category_path"].apply(lambda x: x.
 
 # drop rows with null value of columns 'user_id' or 'product_id'
 session_data.dropna(subset=['user_id', 'product_id'], inplace=True)
+session_data.drop(columns=['purchase_id'], inplace=True)
 
 # drop rows with products that are incorrect
 incorrect_sessions = session_data[ session_data["product_id"].isin(incorrect_products_ids)].index
 session_data.drop(incorrect_sessions, inplace=True)
 
+users_data.drop(columns=['name', 'street'], inplace=True)
+
 # set amount of rows print
 pd.set_option('display.max_rows', 100)
+
+import pdb; pdb.set_trace()
 
 
