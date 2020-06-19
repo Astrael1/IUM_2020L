@@ -103,12 +103,8 @@ def getSessionAttributes(session, products):
     return result
 
 data = []
-i = 100
 for name, group in groupped_sessions:
     data.append(getSessionAttributes(group, product_data))
-    i -= 1
-    if(i == 0):
-        break
 
 
 
@@ -146,7 +142,8 @@ fig = plt.figure(figsize=(12, 8))
 sns.heatmap(corr, mask=mask, vmax=.3, center=0,
             square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
-import pdb; pdb.set_trace()
+sessiondf.to_csv(path_of_buf='session_preprocessed.csv')
+
 
 
 
