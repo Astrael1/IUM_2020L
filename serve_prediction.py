@@ -1,41 +1,22 @@
 from data_processing.preprocess_basic import make_training_set as make_basic_data
 from data_processing.preprocess_mature import make_training_set as make_mature_data
-from data_processing.preprocess_mature import getListOfCategories
+from data_processing.preprocess_mature import getListOfCategories, category_weights
 from model.model import load_model, BASE_MODEL_ATTRIBUTES, MATURE_MODEL_ATTRIBUTES
 import argparse
 import pandas as pd
 import numpy as np
 
-category_weights = {
-        'Gry i konsole': 1/3,
-        'Gry komputerowe': 2/3,
-        'Gry na konsole': 1/3,
-        'Gry PlayStation3': 1/3,
-        'Gry Xbox 360': 1/3,
-        'Komputery': 1/3,
-        'Drukarki i skanery': 1/3,
-        'Biurowe urządzenia wielofunkcyjne': 1/3,
-        'Monitory': 1/3,
-        'Monitory LCD': 1/3,
-        'Tablety i akcesoria': 1/3,
-        'Tablety': 1/3,
-        'Sprzęt RTV': 1/3,
-        'Audio': 1/3,
-        'Słuchawki': 1/3,
-        'Przenośne audio i video': 1/3,
-        'Odtwarzacze mp3 i mp4': 1/3,
-        'Video': 1/3,
-        'Odtwarzacze DVD': 1/3,
-        'Telewizory i akcesoria': 1/6,
-        'Anteny RTV': 1/6,
-        'Okulary 3D': 1/6,
-        'Telefony i akcesoria': 1/3,
-        'Akcesoria telefoniczne': 1/3,
-        'Zestawy głośnomówiące': 1/3,
-        'Zestawy słuchawkowe': 1/3,
-        'Telefony komórkowe': 2/3,
-        'Telefony stacjonarne': 2/3
-    }
+
+def get_categories():
+    products = pd.read_json('resources/products.jsonl', lines=True)
+    incorrect_products = products[
+        (products["price"] <= 0) |
+        (products["price"] > 1000000) |
+        (products['product_name'].str.contains('#|;|&', regex=True))].index
+    products.drop(incorrect_products, inplace=True)
+    products["category_path"] = products["category_path"].apply(lambda x: x.split(';'))
+
+    return getListOfCategories(products)
 
 
 if __name__ == '__main__':
@@ -51,12 +32,10 @@ if __name__ == '__main__':
         print("Give all args!")
     else:
         products_preprocessed = pd.read_csv(args.p)
-        products_preprocessed[['product_id']] = products_preprocessed[['product_id']].applymap(np.int64)
-        products = pd.read_json('resources/products.jsonl', lines=True)
+        products_preprocessed.set_index('product_id', inplace=True)
         users = pd.read_csv(args.u)
+        users.set_index('user_id', inplace=True)
         sessions = pd.read_json(args.s, lines=True)
-        sessions.user_id = sessions.user_id.astype(int)
-        sessions.product_id = sessions.product_id.astype(int)
         data = None
         features = []
 
@@ -64,12 +43,10 @@ if __name__ == '__main__':
             data = make_basic_data(sessions, products_preprocessed)
             features = BASE_MODEL_ATTRIBUTES
         else:
-            data = make_mature_data(products_preprocessed, sessions, users, getListOfCategories(products), category_weights)
+            data = make_mature_data(products_preprocessed, sessions, users, get_categories(),
+                                    category_weights)
             features = MATURE_MODEL_ATTRIBUTES
 
         model = load_model(args.m)
+        print(data.index.tolist())
         print(model.predict(data[features]))
-
-
-
-

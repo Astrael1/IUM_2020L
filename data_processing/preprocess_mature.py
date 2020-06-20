@@ -56,38 +56,39 @@ def preprocess_all(product_data, session_data, users_data):
     return product_data, sessions_train, sessions_test, users_data
 
 
-def fit(product_data, session_data, users_data):
-    category_weights = {
-        'Gry i konsole': 1 / 3,
-        'Gry komputerowe': 2 / 3,
-        'Gry na konsole': 1 / 3,
-        'Gry PlayStation3': 1 / 3,
-        'Gry Xbox 360': 1 / 3,
-        'Komputery': 1 / 3,
-        'Drukarki i skanery': 1 / 3,
-        'Biurowe urządzenia wielofunkcyjne': 1 / 3,
-        'Monitory': 1 / 3,
-        'Monitory LCD': 1 / 3,
-        'Tablety i akcesoria': 1 / 3,
-        'Tablety': 1 / 3,
-        'Sprzęt RTV': 1 / 3,
-        'Audio': 1 / 3,
-        'Słuchawki': 1 / 3,
-        'Przenośne audio i video': 1 / 3,
-        'Odtwarzacze mp3 i mp4': 1 / 3,
-        'Video': 1 / 3,
-        'Odtwarzacze DVD': 1 / 3,
-        'Telewizory i akcesoria': 1 / 6,
-        'Anteny RTV': 1 / 6,
-        'Okulary 3D': 1 / 6,
-        'Telefony i akcesoria': 1 / 3,
-        'Akcesoria telefoniczne': 1 / 3,
-        'Zestawy głośnomówiące': 1 / 3,
-        'Zestawy słuchawkowe': 1 / 3,
-        'Telefony komórkowe': 2 / 3,
-        'Telefony stacjonarne': 2 / 3
-    }
+category_weights = {
+    'Gry i konsole': 1 / 3,
+    'Gry komputerowe': 2 / 3,
+    'Gry na konsole': 1 / 3,
+    'Gry PlayStation3': 1 / 3,
+    'Gry Xbox 360': 1 / 3,
+    'Komputery': 1 / 3,
+    'Drukarki i skanery': 1 / 3,
+    'Biurowe urządzenia wielofunkcyjne': 1 / 3,
+    'Monitory': 1 / 3,
+    'Monitory LCD': 1 / 3,
+    'Tablety i akcesoria': 1 / 3,
+    'Tablety': 1 / 3,
+    'Sprzęt RTV': 1 / 3,
+    'Audio': 1 / 3,
+    'Słuchawki': 1 / 3,
+    'Przenośne audio i video': 1 / 3,
+    'Odtwarzacze mp3 i mp4': 1 / 3,
+    'Video': 1 / 3,
+    'Odtwarzacze DVD': 1 / 3,
+    'Telewizory i akcesoria': 1 / 6,
+    'Anteny RTV': 1 / 6,
+    'Okulary 3D': 1 / 6,
+    'Telefony i akcesoria': 1 / 3,
+    'Akcesoria telefoniczne': 1 / 3,
+    'Zestawy głośnomówiące': 1 / 3,
+    'Zestawy słuchawkowe': 1 / 3,
+    'Telefony komórkowe': 2 / 3,
+    'Telefony stacjonarne': 2 / 3
+}
 
+
+def fit(product_data, session_data, users_data):
     all_categories = getListOfCategories(product_data)
     category_weight_list = [category_weights[all_categories[i]] for i in range(len(all_categories))]
 
@@ -315,4 +316,3 @@ if __name__ == '__main__':
     sessiondf_test.to_csv(path_or_buf='session_test.csv')
     users_data.to_csv(path_or_buf='users_preprocessed.csv')
     product_data.to_csv(path_or_buf='products_mature_preprocessed.csv')
-
