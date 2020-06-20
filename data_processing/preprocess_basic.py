@@ -124,5 +124,5 @@ if __name__ == '__main__':
                 square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
     sessiondf.to_csv(path_or_buf='session_preprocessed.csv')
-    product_data.to_csv(path_or_buf='products_preprocessed.csv')
+    product_data.to_csv(path_or_buf='products_basic_preprocessed.csv')
 

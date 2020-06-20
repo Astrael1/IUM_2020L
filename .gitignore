@@ -1,4 +1,4 @@
 .idea
-model/__pycache__
+**/__pycache__
 *.csv
-trained_models/
+*.sav
