@@ -42,16 +42,6 @@ pd.set_option('display.max_rows', 100)
 all_session_ids = session_data.session_id.unique()
 
 
-def getSessionOfId(session_data, id):
-    return session_data[session_data.session_id == id]
-
-
-def getSuccessfullSessions(session_data, session_ids):
-    return [id for id in session_ids if (getSessionOfId(session_data, id).event_type == 'BUY_PRODUCT').any()]
-
-
-# print(session_data[session_data.session_id.isin(getSuccessfullSessions(session_data, all_session_ids))])
-
 def getListOfCategories(product_data):
     a = set()
     for categories in product_data.category_path:
@@ -59,6 +49,68 @@ def getListOfCategories(product_data):
             a.add(item)
     return sorted(list(a))
 
+category_weights = {
+    'Gry i konsole': 1/3,
+    'Gry komputerowe': 2/3,
+    'Gry na konsole': 1/3,
+    'Gry PlayStation3': 1/3,
+    'Gry Xbox 360': 1/3,
+    'Komputery': 1/3,
+    'Drukarki i skanery': 1/3,
+    'Biurowe urządzenia wielofunkcyjne': 1/3,
+    'Monitory': 1/3,
+    'Monitory LCD': 1/3,
+    'Tablety i akcesoria': 1/3,
+    'Tablety': 1/3,
+    'Sprzęt RTV': 1/3,
+    'Audio': 1/3,
+    'Słuchawki': 1/3,
+    'Przenośne audio i video': 1/3,
+    'Odtwarzacze mp3 i mp4': 1/3,
+    'Video': 1/3,
+    'Odtwarzacze DVD': 1/3,
+    'Telewizory i akcesoria': 1/6,
+    'Anteny RTV': 1/6,
+    'Okulary 3D': 1/6,
+    'Telefony i akcesoria': 1/3,
+    'Akcesoria telefoniczne': 1/3,
+    'Zestawy głośnomówiące': 1/3,
+    'Zestawy słuchawkowe': 1/3,
+    'Telefony komórkowe': 2/3,
+    'Telefony stacjonarne': 2/3
+}
+
+def categoryListIntoSeries(listSeries, name):
+    return listSeries.apply(lambda x: name in x)
+
+all_categories = getListOfCategories(product_data)
+category_weight_list = [category_weights[all_categories[i]] for i in range(len(all_categories))]
+
+def getProductHotness(index, products, all_categories, category_weights):
+    product_evaluated = products.loc[index]
+    interesting_categories = [category for category in all_categories if product_evaluated[category]]
+    score = 0
+    for category in interesting_categories:
+        matching_products = products.loc[(products.index != index) & (products[category] == True)]
+        if not matching_products.empty:
+            score += (matching_products.price - product_evaluated.price).mean() * category_weights[category]
+    return score
+
+def preprocess_products(products, all_categories, category_weights):
+    for category in all_categories:
+        newSeries = categoryListIntoSeries(products.category_path, category)
+        products[category] = newSeries
+    grp = products.groupby(all_categories)
+    for line in sorted([group['category_path'].iloc[0] for name, group in grp]): 
+        print(line)
+    
+    products['hotness'] = np.nan
+    getProductHotness(1001, products, all_categories, category_weights)
+    for index in products.index:
+        products.loc[index, 'hotness'] = getProductHotness(index, products, all_categories, category_weights)
+
+
+preprocess_products(product_data, all_categories, category_weights)
 
 groupped_sessions = session_data.groupby('session_id')
 
