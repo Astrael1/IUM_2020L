@@ -125,3 +125,4 @@ if __name__ == '__main__':
 
     sessiondf.to_csv(path_or_buf='session_preprocessed.csv')
     product_data.to_csv(path_or_buf='products_preprocessed.csv')
+

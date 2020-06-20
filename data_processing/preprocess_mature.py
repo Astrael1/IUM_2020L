@@ -315,3 +315,4 @@ if __name__ == '__main__':
     sessiondf_test.to_csv(path_or_buf='session_test.csv')
     users_data.to_csv(path_or_buf='users_preprocessed.csv')
     product_data.to_csv(path_or_buf='products_preprocessed.csv')
+
