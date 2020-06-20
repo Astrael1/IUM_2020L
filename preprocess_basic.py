@@ -123,4 +123,4 @@ fig = plt.figure(figsize=(12, 8))
 sns.heatmap(corr, mask=mask, vmax=.3, center=0,
             square=True, linewidths=.5, cbar_kws={"shrink": .5})
 
-sessiondf.to_csv(path_or_buf='session_preprocessed.csv')
+sessiondf.to_csv(path_or_buf='preprocessed_data/session_preprocessed.csv')
