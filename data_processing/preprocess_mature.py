@@ -6,20 +6,18 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import random
 
-product_data = pd.read_json('resources/products.jsonl', lines=True)
-product_data.set_index('product_id', inplace=True)
-session_data = pd.read_json('resources/sessions.jsonl', lines=True)
-users_data = pd.read_json('resources/users.jsonl', lines=True)
 
 def categoryListIntoSeries(listSeries, name):
     return listSeries.apply(lambda x: name in x)
 
+
 def getListOfCategories(product_data):
-        a = set()
-        for categories in product_data.category_path:
-            for item in categories:
-                a.add(item)
-        return sorted(list(a))
+    a = set()
+    for categories in product_data.category_path:
+        for item in categories:
+            a.add(item)
+    return sorted(list(a))
+
 
 def preprocess_all(product_data, session_data, users_data):
     # find products with price lower or equal 0 and greater than 1000000 and those which have '#','&' or ';' in name
@@ -29,7 +27,6 @@ def preprocess_all(product_data, session_data, users_data):
         (product_data['product_name'].str.contains('#|;|&', regex=True))].index
 
     # find values of their 'product_id' column
-
 
     # drop incorrect products
     product_data.drop(incorrect_products, inplace=True)
@@ -59,37 +56,36 @@ def preprocess_all(product_data, session_data, users_data):
     return product_data, sessions_train, sessions_test, users_data
 
 
-
 def fit(product_data, session_data, users_data):
     category_weights = {
-        'Gry i konsole': 1/3,
-        'Gry komputerowe': 2/3,
-        'Gry na konsole': 1/3,
-        'Gry PlayStation3': 1/3,
-        'Gry Xbox 360': 1/3,
-        'Komputery': 1/3,
-        'Drukarki i skanery': 1/3,
-        'Biurowe urządzenia wielofunkcyjne': 1/3,
-        'Monitory': 1/3,
-        'Monitory LCD': 1/3,
-        'Tablety i akcesoria': 1/3,
-        'Tablety': 1/3,
-        'Sprzęt RTV': 1/3,
-        'Audio': 1/3,
-        'Słuchawki': 1/3,
-        'Przenośne audio i video': 1/3,
-        'Odtwarzacze mp3 i mp4': 1/3,
-        'Video': 1/3,
-        'Odtwarzacze DVD': 1/3,
-        'Telewizory i akcesoria': 1/6,
-        'Anteny RTV': 1/6,
-        'Okulary 3D': 1/6,
-        'Telefony i akcesoria': 1/3,
-        'Akcesoria telefoniczne': 1/3,
-        'Zestawy głośnomówiące': 1/3,
-        'Zestawy słuchawkowe': 1/3,
-        'Telefony komórkowe': 2/3,
-        'Telefony stacjonarne': 2/3
+        'Gry i konsole': 1 / 3,
+        'Gry komputerowe': 2 / 3,
+        'Gry na konsole': 1 / 3,
+        'Gry PlayStation3': 1 / 3,
+        'Gry Xbox 360': 1 / 3,
+        'Komputery': 1 / 3,
+        'Drukarki i skanery': 1 / 3,
+        'Biurowe urządzenia wielofunkcyjne': 1 / 3,
+        'Monitory': 1 / 3,
+        'Monitory LCD': 1 / 3,
+        'Tablety i akcesoria': 1 / 3,
+        'Tablety': 1 / 3,
+        'Sprzęt RTV': 1 / 3,
+        'Audio': 1 / 3,
+        'Słuchawki': 1 / 3,
+        'Przenośne audio i video': 1 / 3,
+        'Odtwarzacze mp3 i mp4': 1 / 3,
+        'Video': 1 / 3,
+        'Odtwarzacze DVD': 1 / 3,
+        'Telewizory i akcesoria': 1 / 6,
+        'Anteny RTV': 1 / 6,
+        'Okulary 3D': 1 / 6,
+        'Telefony i akcesoria': 1 / 3,
+        'Akcesoria telefoniczne': 1 / 3,
+        'Zestawy głośnomówiące': 1 / 3,
+        'Zestawy słuchawkowe': 1 / 3,
+        'Telefony komórkowe': 2 / 3,
+        'Telefony stacjonarne': 2 / 3
     }
 
     all_categories = getListOfCategories(product_data)
@@ -118,17 +114,16 @@ def fit(product_data, session_data, users_data):
             newSeries = categoryListIntoSeries(products.category_path, category)
             products[category] = newSeries
         grp = products.groupby(all_categories)
-        for line in sorted([group['category_path'].iloc[0] for name, group in grp]): 
+        for line in sorted([group['category_path'].iloc[0] for name, group in grp]):
             print(line)
-        
+
         products['hotness'] = np.nan
         getProductHotness(1001, products, all_categories, category_weights)
         for index in products.index:
             products.loc[index, 'hotness'] = getProductHotness(index, products, all_categories, category_weights)
-        
+
         frequencyFrame = getProductFrequency(products, sessions)
         products['frequency'] = frequencyFrame['frequency']
-
 
     preprocess_products(product_data, session_data, all_categories, category_weights)
 
@@ -136,7 +131,8 @@ def fit(product_data, session_data, users_data):
         data = {}
         for category in all_categories:
             category_products = products.loc[products[category]].index
-            category_transactions = sessions.loc[sessions.product_id.isin(category_products), 'event_type'] == 'BUY_PRODUCT'
+            category_transactions = sessions.loc[
+                                        sessions.product_id.isin(category_products), 'event_type'] == 'BUY_PRODUCT'
             score = category_transactions.mean()
             data[category] = score
         scoreFrame = pd.DataFrame.from_dict(data, orient='index', columns=['score'])
@@ -145,8 +141,8 @@ def fit(product_data, session_data, users_data):
     detailed_categories = [
         'Gry Xbox 360',
         'Biurowe urządzenia wielofunkcyjne',
-        'Monitory LCD', 
-        'Tablety', 
+        'Monitory LCD',
+        'Tablety',
         'Słuchawki',
         'Odtwarzacze mp3 i mp4',
         'Odtwarzacze DVD',
@@ -159,7 +155,7 @@ def fit(product_data, session_data, users_data):
     topCategories = getTopCategories(3, detailed_categories, session_data, product_data)
 
     def getTopProductSeries(products, topCategories):
-        return products[topCategories].any(axis = 1)
+        return products[topCategories].any(axis=1)
 
     # add information if product is of top category
     topProductSeries = getTopProductSeries(product_data, topCategories)
@@ -169,9 +165,10 @@ def fit(product_data, session_data, users_data):
         user_ids = users.index
         data = []
         for user_id in user_ids:
-            user_purchases_ids = sessions.loc[(sessions.user_id == user_id) & (sessions.event_type == 'BUY_PRODUCT'), 'product_id']
+            user_purchases_ids = sessions.loc[
+                (sessions.user_id == user_id) & (sessions.event_type == 'BUY_PRODUCT'), 'product_id']
             user_products = products.loc[user_purchases_ids]
-            category_sums = user_products[all_categories].sum() 
+            category_sums = user_products[all_categories].sum()
             category_total = category_sums.sum()
             category_sums /= category_total
             calculation_result = category_sums.to_dict()
@@ -182,27 +179,17 @@ def fit(product_data, session_data, users_data):
         category_frame.set_index('user_id', inplace=True)
         users = users.join(category_frame)
         return users
-        
-        
 
     users_data = preprocess_users(users_data, session_data, product_data, all_categories, category_weights)
     return product_data, session_data, users_data, all_categories, category_weights
-
-product_data, sessions_train, sessions_test, users_data = preprocess_all(product_data, session_data, users_data)
-product_data, sessions_train, users_data, all_categories, category_weights = fit(
-    product_data,
-    sessions_train, 
-    users_data)
 
 
 def make_training_set(product_data, session_data, users_data, all_categories, category_weights):
     groupped_sessions = session_data.groupby('session_id')
 
-
     def getSessionAttributes(session, products, users, all_categories, category_weights):
         s_id = session['session_id'].unique()[0]
         user_id = session['user_id'].unique()[0]
-        
 
         timestamps = session.iloc[[0, -1]].timestamp.values
         duration = (timestamps[1] - timestamps[0]) / np.timedelta64(1, 's')
@@ -213,7 +200,8 @@ def make_training_set(product_data, session_data, users_data, all_categories, ca
         discount = session['offered_discount'].values
 
         product_ids = group['product_id']
-        viewed_products_data = products.loc[product_ids].drop(columns = all_categories).drop(columns=['product_name', 'category_path'])
+        viewed_products_data = products.loc[product_ids].drop(columns=all_categories).drop(
+            columns=['product_name', 'category_path'])
         viewed_products_data.insert(1, 'offered_discount', discount, True)
         viewed_products_data.insert(2, 'discount_value',
                                     viewed_products_data.price * viewed_products_data.offered_discount, True)
@@ -238,7 +226,6 @@ def make_training_set(product_data, session_data, users_data, all_categories, ca
             score = products_category_total[category] * user_preferences[category] * category_weights[category]
             data[category] = score
         totalScore = pd.DataFrame.from_dict(data, orient='index', columns=['score']).sum().values[0]
-        
 
         result = {
             'id': s_id,
@@ -256,7 +243,6 @@ def make_training_set(product_data, session_data, users_data, all_categories, ca
         }
         return result
 
-
     data = []
     i = 100
     for name, group in groupped_sessions:
@@ -267,21 +253,21 @@ def make_training_set(product_data, session_data, users_data, all_categories, ca
 
     sessiondf = pd.DataFrame(data)
     sessiondf.set_index('id', inplace=True)
-    
+
     def simplifyColumn(df, column):
         df.loc[df[column] > 0, column] = df.loc[df[column] > 0, column].apply(np.log10).apply(np.floor)
-        df.loc[df[column] < 0, column] = df.loc[df[column] < 0, column].apply(lambda x: -1*x).apply(np.log10).apply(lambda x: -1*x).apply(np.floor)
-
+        df.loc[df[column] < 0, column] = df.loc[df[column] < 0, column].apply(lambda x: -1 * x).apply(np.log10).apply(
+            lambda x: -1 * x).apply(np.floor)
 
     sessiondf_p = sessiondf.copy()
     sessiondf_p.liking_score *= 100
-    for column in ['duration', 'avg_price', 'avg_discount_percent', 'total_discount_percent', 'avg_discount_value', 'total_discount_value', 'total_hotness', 'avg_hotness', 'liking_score']:
+    for column in ['duration', 'avg_price', 'avg_discount_percent', 'total_discount_percent', 'avg_discount_value',
+                   'total_discount_value', 'total_hotness', 'avg_hotness', 'liking_score']:
         simplifyColumn(sessiondf_p, column)
-
 
     grouped_p = sessiondf_p.groupby(
         ['duration', 'avg_price', 'avg_discount_percent', 'total_discount_percent', 'avg_discount_value',
-        'total_discount_value', 'avg_hotness', 'total_hotness', 'liking_score', 'is_top'])
+         'total_discount_value', 'avg_hotness', 'total_hotness', 'liking_score', 'is_top'])
     sessiondf['probability'] = np.nan
 
     for name, group in grouped_p:
@@ -292,9 +278,6 @@ def make_training_set(product_data, session_data, users_data, all_categories, ca
     sessiondf.drop(inplace=True, columns=['success'])
     return sessiondf
 
-sessiondf_train = make_training_set(product_data, sessions_train, users_data, all_categories, category_weights)
-
-sessiondf_test = make_training_set(product_data, sessions_test, users_data, all_categories, category_weights)
 
 def visualise(sessiondf):
     corr = sessiondf.corr()
@@ -308,10 +291,27 @@ def visualise(sessiondf):
                 square=True, linewidths=.5, cbar_kws={"shrink": .5})
     plt.show()
 
-visualise(sessiondf_train)
 
-# sessiondf.to_csv(path_or_buf='session_preprocessed.csv')
-sessiondf_train.to_csv(path_or_buf='session_train.csv')
-sessiondf_test.to_csv(path_or_buf='session_test.csv')
-users_data.to_csv(path_or_buf='users_preprocessed.csv')
-product_data.to_csv(path_or_buf='products_preprocessed.csv')
+if __name__ == '__main__':
+    product_data = pd.read_json('../resources/products.jsonl', lines=True)
+    product_data.set_index('product_id', inplace=True)
+    session_data = pd.read_json('../resources/sessions.jsonl', lines=True)
+    users_data = pd.read_json('../resources/users.jsonl', lines=True)
+
+    product_data, sessions_train, sessions_test, users_data = preprocess_all(product_data, session_data, users_data)
+    product_data, sessions_train, users_data, all_categories, category_weights = fit(
+        product_data,
+        sessions_train,
+        users_data)
+
+    sessiondf_train = make_training_set(product_data, sessions_train, users_data, all_categories, category_weights)
+
+    sessiondf_test = make_training_set(product_data, sessions_test, users_data, all_categories, category_weights)
+
+    visualise(sessiondf_train)
+
+    # sessiondf.to_csv(path_or_buf='session_preprocessed.csv')
+    sessiondf_train.to_csv(path_or_buf='session_train.csv')
+    sessiondf_test.to_csv(path_or_buf='session_test.csv')
+    users_data.to_csv(path_or_buf='users_preprocessed.csv')
+    product_data.to_csv(path_or_buf='products_preprocessed.csv')
