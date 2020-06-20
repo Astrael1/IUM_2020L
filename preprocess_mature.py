@@ -312,6 +312,6 @@ visualise(sessiondf_train)
 
 # sessiondf.to_csv(path_or_buf='session_preprocessed.csv')
 sessiondf_train.to_csv(path_or_buf='session_train.csv')
-sessiondf_train.to_csv(path_or_buf='session_train.csv')
+sessiondf_test.to_csv(path_or_buf='session_test.csv')
 users_data.to_csv(path_or_buf='users_preprocessed.csv')
 product_data.to_csv(path_or_buf='products_preprocessed.csv')
