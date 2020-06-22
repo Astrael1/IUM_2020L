@@ -274,9 +274,9 @@ def make_training_set(product_data, session_data, users_data, all_categories, ca
     for name, group in grouped_p:
         result = group['success'].sum() / len(group)
         sessiondf.loc[group.index, 'probability'] = result
-        print(name, result)
-    print("groups: ", len(grouped_p))
-    sessiondf.drop(inplace=True, columns=['success'])
+    #     print(name, result)
+    # print("groups: ", len(grouped_p))
+    # sessiondf.drop(inplace=True, columns=['success'])
     return sessiondf
 
 

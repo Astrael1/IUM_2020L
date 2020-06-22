@@ -4,7 +4,7 @@ from data_processing.preprocess_mature import getListOfCategories, category_weig
 from model.model import load_model, BASE_MODEL_ATTRIBUTES, MATURE_MODEL_ATTRIBUTES
 import argparse
 import pandas as pd
-import numpy as np
+import csv
 
 
 def get_categories():
@@ -19,34 +19,43 @@ def get_categories():
     return getListOfCategories(products)
 
 
+products_mature_preprocessed_path = 'data_processing/products_mature_preprocessed.csv'
+products_basic_preprocessed_path = 'data_processing/products_basic_preprocessed.csv'
+user_preprocessed_path = 'data_processing/users_preprocessed.csv'
+model_mature_path = 'trained_models/mature_model.sav'
+model_basic_path = 'trained_models/basic_model.sav'
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Session purchase probability predictor")
-    parser.add_argument('-m', type=str, help="Saved model path")
     parser.add_argument('-b', action='store_true', help='Use basic model?')
-    parser.add_argument('-p', type=str, help='Products preprocessed file')
-    parser.add_argument('-s', type=str, help='Sessions json file')
-    parser.add_argument('-u', type=str, help='Users preprocessed file')
+    parser.add_argument('-s', type=str, help='Use basic model?')
     args = parser.parse_args()
 
-    if args.p is None or args.s is None or args.u is None:
-        print("Give all args!")
-    else:
-        products_preprocessed = pd.read_csv(args.p)
+    users = pd.read_csv(user_preprocessed_path)
+    users.set_index('user_id', inplace=True)
+    sessions = pd.read_json(args.s, lines=True)
+    data = None
+    features = []
+    model = None
+
+    if args.b:
+        products_preprocessed = pd.read_csv(products_basic_preprocessed_path)
         products_preprocessed.set_index('product_id', inplace=True)
-        users = pd.read_csv(args.u)
-        users.set_index('user_id', inplace=True)
-        sessions = pd.read_json(args.s, lines=True)
-        data = None
-        features = []
+        model = load_model(model_basic_path)
+        data = make_basic_data(sessions, products_preprocessed)
+        features = BASE_MODEL_ATTRIBUTES
+    else:
+        products_preprocessed = pd.read_csv(products_mature_preprocessed_path)
+        products_preprocessed.set_index('product_id', inplace=True)
+        model = load_model(model_mature_path)
+        data = make_mature_data(products_preprocessed, sessions, users, get_categories(),
+                                category_weights)
+        features = MATURE_MODEL_ATTRIBUTES
 
-        if args.b:
-            data = make_basic_data(sessions, products_preprocessed)
-            features = BASE_MODEL_ATTRIBUTES
-        else:
-            data = make_mature_data(products_preprocessed, sessions, users, get_categories(),
-                                    category_weights)
-            features = MATURE_MODEL_ATTRIBUTES
+    indexes, predictions = data.index.tolist(), model.predict(data[features])
+    with open('predictions.csv', mode='w', newline='') as prediction_file:
+        writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for i in range(0, len(indexes)):
+            writer.writerow([indexes[i], predictions[i]])
+            print(f'session_id: {indexes[i]} purchase_probability: {predictions[i]}')
 
-        model = load_model(args.m)
-        print(data.index.tolist())
-        print(model.predict(data[features]))
