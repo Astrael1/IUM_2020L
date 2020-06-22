@@ -10,6 +10,8 @@ if __name__ == '__main__':
 
     sessions_data = {}
     scores = []
+    good = 0
+    bad = 0
 
     if args.p is None or args.s is None:
         print('Give all args!')
@@ -25,9 +27,17 @@ if __name__ == '__main__':
                 sessions_data[row[0]]['status'] = float(row[1])
 
         for key in sessions_data.keys():
+            score = 0
             if sessions_data[key]['status'] == 1:
-                scores.append(sessions_data[key]['prediction'] - 0.5)
+                score = sessions_data[key]['prediction'] - 0.5
             else:
-                scores.append(0.5 - sessions_data[key]['prediction'])
+                score = 0.5 - sessions_data[key]['prediction']
+            if score > 0:
+                good += 1
+            else:
+                bad += 1
+            scores.append(score)
+            print(f'session_id: {key} score: {score}')
 
-    print(np.mean(scores))
+    print(f'Good predictions: {good}, bad predictions: {bad}')
+    print(f'Mean score {np.mean(scores)}')

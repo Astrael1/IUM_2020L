@@ -28,7 +28,8 @@ model_basic_path = 'trained_models/basic_model.sav'
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Session purchase probability predictor")
     parser.add_argument('-b', action='store_true', help='Use basic model?')
-    parser.add_argument('-s', type=str, help='Use basic model?')
+    parser.add_argument('-s', type=str, help='Sessions data (jsonl)')
+    parser.add_argument('-o', type=str, help='Output file name?')
     args = parser.parse_args()
 
     users = pd.read_csv(user_preprocessed_path)
@@ -53,7 +54,7 @@ if __name__ == '__main__':
         features = MATURE_MODEL_ATTRIBUTES
 
     indexes, predictions = data.index.tolist(), model.predict(data[features])
-    with open('predictions.csv', mode='w', newline='') as prediction_file:
+    with open(args.o if args.o is not None else 'predictions.csv', mode='w', newline='') as prediction_file:
         writer = csv.writer(prediction_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for i in range(0, len(indexes)):
             writer.writerow([indexes[i], predictions[i]])
