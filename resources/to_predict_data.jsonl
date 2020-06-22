@@ -1,0 +1,16 @@
+{"session_id": 5, "timestamp": "2020-03-13T17:38:16", "user_id": 201, "product_id": 1064, "event_type": "VIEW_PRODUCT", "offered_discount": 0}
+{"session_id": 5, "timestamp": "2020-03-13T17:41:21", "user_id": 201, "product_id": 1077, "event_type": "VIEW_PRODUCT", "offered_discount": 0}
+{"session_id": 5, "timestamp": "2020-03-13T17:41:30", "user_id": 201, "product_id": 1065, "event_type": "VIEW_PRODUCT", "offered_discount": 0 }
+{"session_id": 6, "timestamp": "2020-01-15T18:34:40", "user_id": 250, "product_id": 1200, "event_type": "VIEW_PRODUCT", "offered_discount": 20}
+{"session_id": 6, "timestamp": "2020-01-15T18:36:22", "user_id": 250, "product_id": 1250, "event_type": "VIEW_PRODUCT", "offered_discount": 20}
+{"session_id": 6, "timestamp": "2020-01-15T18:38:39", "user_id": 250, "product_id": 1081, "event_type": "VIEW_PRODUCT", "offered_discount": 20}
+{"session_id": 6, "timestamp": "2020-01-15T18:40:52", "user_id": 250, "product_id": 1099, "event_type": "VIEW_PRODUCT", "offered_discount": 20}
+{"session_id": 6, "timestamp": "2020-01-15T18:43:48", "user_id": 250, "product_id": 1145, "event_type": "VIEW_PRODUCT", "offered_discount": 20}
+{"session_id": 70, "timestamp": "2020-01-25T05:05:38", "user_id": 147, "product_id": 1167, "event_type": "VIEW_PRODUCT", "offered_discount": 10}
+{"session_id": 70, "timestamp": "2020-01-25T05:06:21", "user_id": 147, "product_id": 1072, "event_type": "VIEW_PRODUCT", "offered_discount": 10}
+{"session_id": 70, "timestamp": "2020-01-25T05:12:14", "user_id": 147, "product_id": 1060, "event_type": "VIEW_PRODUCT", "offered_discount": 10}
+{"session_id": 70, "timestamp": "2020-01-25T05:13:54", "user_id": 147, "product_id": 1207, "event_type": "VIEW_PRODUCT", "offered_discount": 10}
+{"session_id": 99, "timestamp": "2020-03-08T01:55:27", "user_id": 299, "product_id": 1034, "event_type": "VIEW_PRODUCT", "offered_discount": 0}
+{"session_id": 99, "timestamp": "2020-03-08T01:58:03", "user_id": 299, "product_id": 1056, "event_type": "VIEW_PRODUCT", "offered_discount": 0}
+{"session_id": 99, "timestamp": "2020-03-08T02:01:11", "user_id": 299, "product_id": 1001, "event_type": "VIEW_PRODUCT", "offered_discount": 0}
+{"session_id": 99, "timestamp": "2020-03-08T02:01:26", "user_id": 299, "product_id": 1075, "event_type": "VIEW_PRODUCT", "offered_discount": 0}
